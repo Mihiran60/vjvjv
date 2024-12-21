@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Card Example</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; text-align: center; }
+        .card-container { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+        .card { background-color: #f9f9f9; border: 1px solid #ddd; border-radius: 8px; padding: 10px; width: 200px; }
+        .card h3 { margin: 0; font-size: 1.2em; }
+        button { padding: 10px 15px; font-size: 1em; border: none; border-radius: 5px; background-color: #007bff; color: white; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Shared Card Example</h1>
+    <button onclick="addCard()">Add Card</button>
+    <div class="card-container" id="cardContainer"></div>
+
+    <script>
+        // Load cards from the URL on page load
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const cards = params.get("cards");
+            if (cards) {
+                const cardArray = JSON.parse(decodeURIComponent(cards));
+                cardArray.forEach((card, index) => renderCard(index + 1, card));
+            }
+        };
+
+        let cardCount = 0;
+
+        function addCard() {
+            // Increment card count
+            cardCount++;
+
+            // Get a custom message for the card
+            const message = prompt("Enter a message for the card:");
+            if (!message) return;
+
+            // Render the card
+            renderCard(cardCount, message);
+
+            // Update the URL with the new cards
+            updateURL();
+        }
+
+        function renderCard(count, message) {
+            const card = document.createElement("div");
+            card.className = "card";
+            card.innerHTML = `<h3>Card ${count}</h3><p>${message}</p>`;
+            document.getElementById("cardContainer").appendChild(card);
+        }
+
+        function updateURL() {
+            const cards = [];
+            document.querySelectorAll(".card").forEach((card) => {
+                cards.push(card.querySelector("p").textContent);
+            });
+            const encodedCards = encodeURIComponent(JSON.stringify(cards));
+            const newURL = `${window.location.origin}${window.location.pathname}?cards=${encodedCards}`;
+            window.history.replaceState(null, "", newURL);
+        }
+    </script>
+</body>
+</html>
